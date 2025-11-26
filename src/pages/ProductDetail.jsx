@@ -10,6 +10,8 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [availableSizes, setAvailableSizes] = useState([]);
   const [addingToCart, setAddingToCart] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -21,6 +23,15 @@ const ProductDetail = () => {
     try {
       const response = await productAPI.getById(id);
       setProduct(response.data);
+      
+      // تحميل المقاسات المتاحة
+      if (response.data.sizes) {
+        const available = response.data.sizes.filter(size => size.quantity > 0);
+        setAvailableSizes(available);
+        if (available.length > 0) {
+          setSelectedSize(available[0].size);
+        }
+      }
     } catch (error) {
       console.log('لم يتم العثور علي المنتجات');
       toast.error('خطأ في تحميل المنتج', {
@@ -33,7 +44,7 @@ const ProductDetail = () => {
   };
 
   const addToCart = async () => {
-    if (product.stock === 0) {
+    if (availableSizes.length === 0) {
       toast.error('المنتج غير متوفر', {
         description: 'هذا المنتج غير متوفر حالياً',
         duration: 4000,
@@ -41,28 +52,67 @@ const ProductDetail = () => {
       return;
     }
 
+    if (!selectedSize) {
+      toast.error('الرجاء اختيار مقاس', {
+        description: 'يجب اختيار مقاس قبل إضافة المنتج إلى السلة',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // التحقق من توفر الكمية للمقاس المختار
+    const selectedSizeData = availableSizes.find(size => size.size === selectedSize);
+    if (!selectedSizeData || selectedSizeData.quantity < quantity) {
+      toast.error('الكمية غير متوفرة', {
+        description: `الكمية المطلوبة غير متوفرة للمقاس ${selectedSize}`,
+        duration: 4000,
+      });
+      return;
+    }
+
     setAddingToCart(true);
     
-    // Show loading toast
     const toastId = toast.loading('جاري إضافة المنتج إلى السلة...', {
       duration: Infinity,
     });
     
     setTimeout(() => {
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const existingItem = cart.find(item => item.product._id === product._id);
+      const existingItemIndex = cart.findIndex(item => 
+        item.product._id === product._id && item.selectedSize === selectedSize
+      );
       
-      if (existingItem) {
-        existingItem.quantity += quantity;
+      if (existingItemIndex >= 0) {
+        // تحديث الكمية للمقاس الموجود
+        const newQuantity = cart[existingItemIndex].quantity + quantity;
+        if (newQuantity > selectedSizeData.quantity) {
+          toast.error('الكمية غير متوفرة', {
+            description: `الكمية الإجمالية تتجاوز المخزون المتاح للمقاس ${selectedSize}`,
+            duration: 4000,
+            id: toastId,
+          });
+          setAddingToCart(false);
+          return;
+        }
+        cart[existingItemIndex].quantity = newQuantity;
         toast.success('تم تحديث الكمية', {
-          description: `تم تحديث كمية "${product.name}" في السلة`,
+          description: `تم تحديث كمية "${product.name}" - المقاس ${selectedSize} في السلة`,
           duration: 3000,
           id: toastId,
         });
       } else {
-        cart.push({ product, quantity });
+        // إضافة منتج جديد بمقاس مختلف
+        cart.push({ 
+          product: {
+            ...product,
+            selectedSize: selectedSize,
+            availableSizes: availableSizes
+          }, 
+          quantity: quantity,
+          selectedSize: selectedSize
+        });
         toast.success('تمت الإضافة إلى السلة', {
-          description: `تم إضافة "${product.name}" إلى سلة التسوق`,
+          description: `تم إضافة "${product.name}" - المقاس ${selectedSize} إلى سلة التسوق`,
           duration: 3000,
           id: toastId,
         });
@@ -72,7 +122,7 @@ const ProductDetail = () => {
       window.dispatchEvent(new Event('storage'));
       setAddingToCart(false);
       
-      // Navigate to cart after a short delay
+      // الانتقال إلى السلة بعد تأخير قصير
       setTimeout(() => {
         navigate('/cart');
       }, 1000);
@@ -122,7 +172,7 @@ const ProductDetail = () => {
 
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 p-8">
-            {/* Product Image - Clear even when out of stock */}
+            {/* Product Image */}
             <div className="relative">
               <div className="relative bg-gray-100 rounded-2xl overflow-hidden">
                 {!imageLoaded && (
@@ -144,7 +194,7 @@ const ProductDetail = () => {
                   الأكثر مبيعاً
                 </span>
               )}
-              {product.stock === 0 && (
+              {availableSizes.length === 0 && (
                 <div className="absolute top-6 left-6 bg-red-500 text-white px-5 py-2 rounded-full font-semibold text-base shadow-xl">
                   غير متوفر
                 </div>
@@ -165,16 +215,33 @@ const ProductDetail = () => {
 
               <div className="py-4">
                 <span className={`text-xl font-semibold px-4 py-2 rounded-lg ${
-                  product.stock > 0 
+                  availableSizes.length > 0 
                     ? 'bg-green-100 text-green-700' 
                     : 'bg-red-100 text-red-700'
                 }`}>
-                  {product.stock > 0 ? `🟢 متوفر (${product.stock} قطعة)` : '🔴 غير متوفر'}
+                  {availableSizes.length > 0 ? `🟢 متوفر (${product.totalStock} قطعة)` : '🔴 غير متوفر'}
                 </span>
               </div>
 
-              {product.stock > 0 ? (
+              {availableSizes.length > 0 ? (
                 <div className="space-y-6">
+                  {/* اختيار المقاس */}
+                  <div className="flex items-center space-x-4 rtl:space-x-reverse bg-gray-50 p-4 rounded-xl">
+                    <label className="text-lg font-medium text-gray-700">المقاس:</label>
+                    <select
+                      value={selectedSize}
+                      onChange={(e) => setSelectedSize(e.target.value)}
+                      className="border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white"
+                    >
+                      {availableSizes.map(size => (
+                        <option key={size.size} value={size.size}>
+                          {size.size} (متوفر: {size.quantity})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* اختيار الكمية */}
                   <div className="flex items-center space-x-4 rtl:space-x-reverse bg-gray-50 p-4 rounded-xl">
                     <label className="text-lg font-medium text-gray-700">الكمية:</label>
                     <select
@@ -182,7 +249,10 @@ const ProductDetail = () => {
                       onChange={(e) => setQuantity(parseInt(e.target.value))}
                       className="border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white"
                     >
-                      {[...Array(Math.min(product.stock, 10)).keys()].map(num => (
+                      {[...Array(Math.min(
+                        availableSizes.find(size => size.size === selectedSize)?.quantity || 0, 
+                        10
+                      )).keys()].map(num => (
                         <option key={num + 1} value={num + 1}>{num + 1}</option>
                       ))}
                     </select>
@@ -203,7 +273,7 @@ const ProductDetail = () => {
                         <svg className="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        أضف إلى السلة
+                        أضف إلى السلة - المقاس {selectedSize}
                       </>
                     )}
                   </button>

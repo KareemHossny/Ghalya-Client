@@ -52,6 +52,7 @@ export const productAPI = {
   getBestsellers: () => api.get('/api/products/bestsellers'),
 
 };
+
 export const contactAPI = {
   // Send contact message
   sendMessage: (messageData) => api.post('/api/contact', messageData),
@@ -66,6 +67,7 @@ export const orderAPI = {
   getById: (id) => api.get(`/api/orders/${id}`),
 
 };
+
 export const shippingAPI = {
   // Get all governorates with shipping costs
   getGovernorates: async () => {

@@ -14,14 +14,16 @@ const Cart = () => {
     setLoading(false);
   }, []);
 
-  const updateQuantity = async (productId, newQuantity) => {
+  const updateQuantity = async (productId, selectedSize, newQuantity) => {
     if (newQuantity < 1) return;
     
-    setUpdatingItem(productId);
+    setUpdatingItem(`${productId}-${selectedSize}`);
     
     setTimeout(() => {
       const updatedCart = cart.map(item => 
-        item.product._id === productId ? { ...item, quantity: newQuantity } : item
+        item.product._id === productId && item.selectedSize === selectedSize 
+          ? { ...item, quantity: newQuantity } 
+          : item
       );
       
       setCart(updatedCart);
@@ -31,8 +33,10 @@ const Cart = () => {
     }, 300);
   };
 
-  const removeItem = (productId) => {
-    const updatedCart = cart.filter(item => item.product._id !== productId);
+  const removeItem = (productId, selectedSize) => {
+    const updatedCart = cart.filter(item => 
+      !(item.product._id === productId && item.selectedSize === selectedSize)
+    );
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
     window.dispatchEvent(new Event('storage'));
@@ -103,7 +107,7 @@ const Cart = () => {
 
                 <div className="space-y-4 md:space-y-6">
                   {cart.map(item => (
-                    <div key={item.product._id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl md:rounded-2xl hover:shadow-lg transition-all duration-300">
+                    <div key={`${item.product._id}-${item.selectedSize}`} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-6 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl md:rounded-2xl hover:shadow-lg transition-all duration-300">
                       {/* Product Image */}
                       <div className="flex items-center gap-4 sm:flex-col sm:items-start">
                         <div className="relative">
@@ -134,9 +138,14 @@ const Cart = () => {
                             <h3 className="font-bold text-gray-800 text-lg sm:text-xl leading-tight">
                               {item.product.name}
                             </h3>
-                            <p className="text-pink-600 font-bold text-base sm:text-lg mt-1">
-                              {item.product.price} ج.م
-                            </p>
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-semibold">
+                                المقاس: {item.selectedSize}
+                              </span>
+                              <p className="text-pink-600 font-bold text-base sm:text-lg">
+                                {item.product.price} ج.م
+                              </p>
+                            </div>
                           </div>
                           
                           {/* Desktop Price */}
@@ -151,25 +160,25 @@ const Cart = () => {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                           <div className="flex items-center border-2 border-gray-300 rounded-lg md:rounded-xl bg-white w-fit">
                             <button
-                              onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.product._id, item.selectedSize, item.quantity - 1)}
                               className="p-2 sm:p-3 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                              disabled={item.quantity <= 1 || updatingItem === item.product._id}
+                              disabled={item.quantity <= 1 || updatingItem === `${item.product._id}-${item.selectedSize}`}
                             >
                               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                               </svg>
                             </button>
                             <span className="px-3 sm:px-4 py-1 sm:py-2 font-semibold min-w-10 sm:min-w-12 text-center text-sm sm:text-base">
-                              {updatingItem === item.product._id ? (
+                              {updatingItem === `${item.product._id}-${item.selectedSize}` ? (
                                 <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
                               ) : (
                                 item.quantity
                               )}
                             </span>
                             <button
-                              onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.product._id, item.selectedSize, item.quantity + 1)}
                               className="p-2 sm:p-3 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                              disabled={item.quantity >= item.product.stock || updatingItem === item.product._id}
+                              disabled={updatingItem === `${item.product._id}-${item.selectedSize}`}
                             >
                               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -178,7 +187,7 @@ const Cart = () => {
                           </div>
                           
                           <button
-                            onClick={() => removeItem(item.product._id)}
+                            onClick={() => removeItem(item.product._id, item.selectedSize)}
                             className="text-red-600 hover:text-red-700 font-semibold text-sm sm:text-base flex items-center gap-2 transition-colors w-fit"
                           >
                             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
