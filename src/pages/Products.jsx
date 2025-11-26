@@ -114,7 +114,7 @@ const Products = () => {
               to="/contact"
               className="inline-flex items-center bg-white text-pink-600 px-10 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
             >
-              تواصل معنا
+              تواصلي معنا
             </Link>
             <Link
               to="/"
