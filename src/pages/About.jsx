@@ -1,8 +1,35 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 const About = () => {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "من نحن - غاليه",
+    "description": "تعرفوا على قصة نجاح غاليه في عالم الأزياء ورسالتنا في تقديم أجود الإسدالات الحريمي",
+    "url": "https://ghalya.vercel.app/about",
+    "publisher": {
+      "@type": "Organization",
+      "name": "غاليه",
+      "description": "متجر متخصص في بيع الإسدالات الحريمي عالية الجودة"
+    }
+  };
+
   return (
+    <>
+      <Helmet>
+        <title>من نحن - غاليه | قصة نجاحنا ورسالتنا في عالم الأزياء</title>
+        <meta name="description" content="تعرفوا على قصة نجاح غاليه في عالم الأزياء. رسالتنا في تقديم أجود الإسدالات الحريمي بأفضل الأسعار وخدمة عملاء متميزة. جودة، أناقة، وثقة." />
+        <meta name="keywords" content="عن غاليه, قصة النجاح, رسالة الشركة, قيمنا, رؤية غاليه, متجر إسدالات, أزياء نسائية" />
+        <meta property="og:title" content="من نحن - غاليه | قصة نجاحنا ورسالتنا" />
+        <meta property="og:description" content="اكتشفوا قصة تأسيس غاليه ورسالتنا في تقديم الأفضل لعملائنا الكرام في عالم الأزياء والإسدالات الحريمي." />
+        <meta property="og:url" content="https://ghalya.vercel.app/about" />
+        <link rel="canonical" href="https://ghalya.vercel.app/about" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-pink-50 py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
@@ -113,6 +140,7 @@ const About = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

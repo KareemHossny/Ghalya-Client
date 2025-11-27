@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { productAPI } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -14,7 +15,6 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 const Home = () => {
   const [bestsellers, setBestsellers] = useState([]);
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     fetchBestsellers();
@@ -31,29 +31,61 @@ const Home = () => {
     }
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "غاليه - متجر الإسدالات الحريمي",
+    "url": "https://ghalya.vercel.app",
+    "description": "أجمل الإسدالات الحريمي بأفضل الأسعار والجودة - تسوقي الآن من غاليه",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://ghalya.vercel.app/products?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            مرحباً بكم في <span className="text-pink-200">غاليه</span>
-          </h1>
-          <p className="text-2xl md:text-3xl mb-12 opacity-95 leading-relaxed max-w-4xl mx-auto">
-            أجمل الإسدالات الحريمي بأفضل الأسعار والجودة
-          </p>
-          <Link
-            to="/products"
-            className="inline-flex items-center bg-white text-pink-600 px-12 py-5 rounded-2xl font-bold text-xl hover:bg-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            <svg className="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            تسوق الآن
-          </Link>
-        </div>
-      </section>
+    <>
+      <Helmet>
+        <title>غاليه - أجمل الإسدالات الحريمي بأفضل الأسعار | متجر أونلاين</title>
+        <meta name="description" content="اكتشفوا أجمل تشكيلة الإسدالات الحريمي من غاليه. جودة عالية، أسعار مناسبة، توصيل سريع لجميع أنحاء مصر. تسوقي الآن واستمتعي بتجربة شراء فريدة." />
+        <meta name="keywords" content="إسدالات حريمي, ملابس نسائية, موضة, تسوق أونلاين, غاليه, إسدالات, أزياء, ملابس محجبات, أزياء إسلامية" />
+        <meta property="og:title" content="غاليه - أجمل الإسدالات الحريمي بأفضل الأسعار" />
+        <meta property="og:description" content="اكتشفوا تشكيلة غاليه المميزة من الإسدالات الحريمي. جودة فائقة وتصميمات أنيقة تناسب جميع الأذواق." />
+        <meta property="og:image" content="https://ghalya.vercel.app/logo.png" />
+        <meta property="og:url" content="https://ghalya.vercel.app" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="غاليه - أجمل الإسدالات الحريمي" />
+        <meta name="twitter:description" content="تسوقي أحدث تشكيلة الإسدالات الحريمي من غاليه" />
+        <link rel="canonical" href="https://ghalya.vercel.app" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black opacity-10"></div>
+          <div className="container mx-auto px-4 text-center relative z-10">
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
+              مرحباً بكم في <span className="text-pink-200">غاليه</span>
+            </h1>
+            <p className="text-2xl md:text-3xl mb-12 opacity-95 leading-relaxed max-w-4xl mx-auto">
+              أجمل الإسدالات الحريمي بأفضل الأسعار والجودة
+            </p>
+            <Link
+              to="/products"
+              className="inline-flex items-center bg-white text-pink-600 px-12 py-5 rounded-2xl font-bold text-xl hover:bg-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              <svg className="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              تسوق الآن
+            </Link>
+          </div>
+        </section>
 
       {/* Features Section */}
       <section className="py-20 bg-gradient-to-b from-white to-gray-50">
@@ -207,6 +239,8 @@ const Home = () => {
         </div>
       </section>
     </div>
+    </>
+
   );
 };
 

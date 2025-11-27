@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { productAPI } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -8,8 +9,6 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-
-
 
   useEffect(() => {
     fetchProducts();
@@ -32,6 +31,26 @@ const Products = () => {
     return true;
   });
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "تشكيلة منتجات غاليه",
+    "description": "تصفحوا تشكيلة غاليه الكاملة من الإسدالات الحريمي",
+    "url": "https://ghalya.vercel.app/products",
+    "numberOfItems": filteredProducts.length,
+    "itemListElement": filteredProducts.map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": product.name,
+        "description": product.description,
+        "image": product.image,
+        "url": `https://ghalya.vercel.app/product/${product._id}`
+      }
+    }))
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-pink-50 flex items-center justify-center">
@@ -41,6 +60,19 @@ const Products = () => {
   }
 
   return (
+    <>
+      <Helmet>
+        <title>تشكيلة المنتجات - غاليه | إسدالات حريمي متنوعة وأسعار مميزة</title>
+        <meta name="description" content="تصفحوا تشكيلة غاليه الكاملة من الإسدالات الحريمي. منتجات عالية الجودة، مقاسات متنوعة، وأسعار منافسة. اكتشفوا الأكثر مبيعاً والعروض الخاصة." />
+        <meta name="keywords" content="إسدالات, منتجات نسائية, أزياء حريمي, تسوق, عروض, الأكثر مبيعاً, ملابس محجبات, أزياء إسلامية" />
+        <meta property="og:title" content="تشكيلة المنتجات - غاليه | إسدالات حريمي متنوعة" />
+        <meta property="og:description" content="اكتشفوا أحدث تشكيلة الإسدالات الحريمي من غاليه بجودة فائقة وتصميمات عصرية." />
+        <meta property="og:url" content="https://ghalya.vercel.app/products" />
+        <link rel="canonical" href="https://ghalya.vercel.app/products" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-pink-50 py-12">
       <div className="container mx-auto px-4">
         {/* Header */}
@@ -126,6 +158,7 @@ const Products = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

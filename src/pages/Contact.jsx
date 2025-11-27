@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { contactAPI, validateEmail } from '../utils/api'; 
 import { toast } from 'sonner';
 
@@ -11,6 +12,25 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "اتصل بنا - غاليه",
+    "description": "تواصلوا مع فريق غاليه لأي استفسارات أو ملاحظات. نحن هنا لمساعدتكم",
+    "url": "https://ghalya.vercel.app/contact",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "غاليه",
+      "telephone": "0123456789",
+      "email": "info@galia.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "القاهرة",
+        "addressCountry": "EG"
+      }
+    }
+  };
+
   const handleChange = (e) => {
     setMessageData({
       ...messageData,
@@ -21,7 +41,6 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // التحقق من صحة البريد الإلكتروني
     if (!validateEmail(messageData.email)) {
       toast.error('البريد الإلكتروني غير صالح', {
         description: 'يرجى إدخال بريد إلكتروني صحيح',
@@ -57,7 +76,6 @@ const Contact = () => {
     } catch (error) {
       console.error('Contact form error:', error);
       
-      // استخدام معالج الأخطاء الموجود في api.js
       if (error.response?.data?.message) {
         toast.error('خطأ في الإرسال', {
           description: error.response.data.message,
@@ -80,6 +98,19 @@ const Contact = () => {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>اتصل بنا - غاليه | خدمة عملاء ودعم فني متكامل</title>
+        <meta name="description" content="تواصلوا مع فريق غاليه لأي استفسارات حول المنتجات، الطلبات، أو خدمة العملاء. نحن هنا لمساعدتكم على مدار الساعة." />
+        <meta name="keywords" content="اتصال غاليه, خدمة عملاء, دعم فني, استفسارات, تواصل, معلومات الاتصال" />
+        <meta property="og:title" content="اتصل بنا - غاليه | خدمة عملاء متكاملة" />
+        <meta property="og:description" content="فريق دعم العملاء في غاليه متاح لمساعدتكم في أي استفسار أو طلب." />
+        <meta property="og:url" content="https://ghalya.vercel.app/contact" />
+        <link rel="canonical" href="https://ghalya.vercel.app/contact" />
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-pink-50 py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
@@ -280,6 +311,7 @@ const Contact = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
