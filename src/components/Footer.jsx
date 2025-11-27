@@ -42,7 +42,7 @@ const Footer = () => {
             </p>
             <div className="flex space-x-5 rtl:space-x-reverse pt-4">
               <a
-                href="https://facebook.com/"
+                href="https://m.facebook.com/share/1T62NdyNFi/?mibextid=wwXIfr&ref=waios.fb_links_xma_control&wtsid=rdr_0OGZzxVRkLx7AyXNw"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-pink-400 transition-all duration-300 p-3 bg-gray-800 hover:bg-pink-900/20 rounded-xl hover:scale-110"
@@ -53,7 +53,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="https://instagram.com/"
+                href="https://www.instagram.com/_____ghalia_brand/?igsh=cm5qbXFqMnJvOWJw"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-pink-400 transition-all duration-300 p-3 bg-gray-800 hover:bg-pink-900/20 rounded-xl hover:scale-110"
