@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -15,32 +15,31 @@ import { Toaster } from 'sonner';
 
 function App() {
   return (
-    <HelmetProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          {/* إضافة meta tag للتحقق من Google */}
-          <Helmet>
-            <meta name="google-site-verification" content="T1U5Tr0Uu43q4_bKa2IFMMYTKgKxsu2J3UrsiTUx7Pg" />
-          </Helmet>
-          
-          <Header />
-          <Toaster position="top-right" richColors closeButton dir="rtl" />
-          <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/order-success" element={<OrderSuccess />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </Router>
-    </HelmetProvider>
+    <Router>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        {/* إضافة meta tag للتحقق من Google في App.js */}
+        <Helmet>
+          <meta name="google-site-verification" content="T1U5Tr0Uu43q4_bKa2IFMMYTKgKxsu2J3UrsiTUx7Pg" />
+          <html lang="ar" dir="rtl" />
+        </Helmet>
+        
+        <Header />
+        <Toaster position="top-right" richColors closeButton dir="rtl" />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success" element={<OrderSuccess />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
