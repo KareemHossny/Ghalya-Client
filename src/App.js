@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import SEO from './components/SEO';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -17,11 +17,8 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* إضافة meta tag للتحقق من Google في App.js */}
-        <Helmet>
-          <meta name="google-site-verification" content="T1U5Tr0Uu43q4_bKa2IFMMYTKgKxsu2J3UrsiTUx7Pg" />
-          <html lang="ar" dir="rtl" />
-        </Helmet>
+        {/* إضافة SEO عام للموقع */}
+        <SEO />
         
         <Header />
         <Toaster position="top-right" richColors closeButton dir="rtl" />
