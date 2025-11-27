@@ -50,6 +50,10 @@ const Cart = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const getUniqueItemsCount = () => {
+    return cart.length;
+  };
+
   if (loading) {
     return <LoadingSpinner size="large" text="جاري تحميل سلة التسوق..." />;
   }
@@ -100,7 +104,7 @@ const Cart = () => {
               <div className="bg-white rounded-2xl md:rounded-3xl shadow-xl md:shadow-2xl p-4 sm:p-6 md:p-8">
                 <div className="flex justify-between items-center mb-6 md:mb-8 pb-4 md:pb-6 border-b border-gray-200">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-                    المنتجات ({getTotalItems()} منتج)
+                    المنتجات ({getUniqueItemsCount()} منتج)
                   </h2>
                   <span className="text-gray-600 text-base sm:text-lg font-medium hidden sm:block">السعر</span>
                 </div>
@@ -146,6 +150,11 @@ const Cart = () => {
                                 {item.product.price} ج.م
                               </p>
                             </div>
+                            {item.product.description && (
+                              <p className="text-gray-600 text-sm mt-2 line-clamp-2">
+                                {item.product.description}
+                              </p>
+                            )}
                           </div>
                           
                           {/* Desktop Price */}
@@ -200,6 +209,26 @@ const Cart = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Cart Actions */}
+                <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-gray-200">
+                  <Link
+                    to="/products"
+                    className="flex-1 text-center bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+                  >
+                    ← الاستمرار في التسوق
+                  </Link>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('cart');
+                      setCart([]);
+                      window.dispatchEvent(new Event('storage'));
+                    }}
+                    className="flex-1 text-center bg-red-100 text-red-700 py-3 rounded-xl font-semibold hover:bg-red-200 transition-colors"
+                  >
+                    تفريغ السلة
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -211,15 +240,19 @@ const Cart = () => {
                 <div className="space-y-4 md:space-y-5 mb-6 md:mb-8">
                   <div className="flex justify-between text-gray-600 text-base sm:text-lg">
                     <span>عدد المنتجات:</span>
-                    <span className="font-semibold">{getTotalItems()}</span>
+                    <span className="font-semibold">{getTotalItems()} قطعة</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600 text-base sm:text-lg">
+                    <span>المنتجات المختلفة:</span>
+                    <span className="font-semibold">{getUniqueItemsCount()} منتج</span>
                   </div>
                   <div className="flex justify-between text-gray-600 text-base sm:text-lg">
                     <span>تكلفة الشحن:</span>
-                    <span className="text-green-600 font-semibold">0</span>
+                    <span className="text-green-600 font-semibold">سيتم حسابها لاحقاً</span>
                   </div>
                   <div className="border-t border-gray-200 pt-4 md:pt-5">
                     <div className="flex justify-between text-xl sm:text-2xl font-bold text-gray-800">
-                      <span>الإجمالي:</span>
+                      <span>المجموع:</span>
                       <span>{getTotalPrice()} ج.م</span>
                     </div>
                   </div>
@@ -232,12 +265,11 @@ const Cart = () => {
                   إتمام الطلب
                 </button>
 
-                <Link
-                  to="/products"
-                  className="block text-center text-gray-600 hover:text-pink-600 transition-colors font-semibold text-base md:text-lg py-3 border-2 border-gray-300 rounded-xl md:rounded-2xl hover:border-pink-600"
-                >
-                  ← الاستمرار في التسوق
-                </Link>
+                <div className="text-center">
+                  <p className="text-gray-500 text-sm">
+                    سيتم حساب مصاريف الشحن في صفحة إتمام الطلب
+                  </p>
+                </div>
 
                 {/* Additional Features */}
                 <div className="mt-6 md:mt-8 space-y-3 md:space-y-4 pt-4 md:pt-6 border-t border-gray-200">
@@ -245,7 +277,7 @@ const Cart = () => {
                     <svg className="w-4 h-4 md:w-5 md:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    شحن مجاني لجميع المحافظات
+                    شحن لجميع المحافظات
                   </div>
                   <div className="flex items-center text-green-600 text-sm md:text-base">
                     <svg className="w-4 h-4 md:w-5 md:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,6 +290,23 @@ const Cart = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     دفع آمن عند الاستلام
+                  </div>
+                </div>
+
+                {/* Cart Summary */}
+                <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+                  <h3 className="font-semibold text-gray-800 mb-2">ملخص السلة:</h3>
+                  <div className="space-y-2 text-sm">
+                    {cart.map(item => (
+                      <div key={`${item.product._id}-${item.selectedSize}`} className="flex justify-between items-center">
+                        <span className="text-gray-600 truncate flex-1">
+                          {item.product.name} - {item.selectedSize}
+                        </span>
+                        <span className="text-gray-800 font-medium whitespace-nowrap">
+                          {item.quantity} × {item.product.price} ج.م
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

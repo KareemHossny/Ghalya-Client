@@ -90,9 +90,12 @@ const Checkout = () => {
         notes: formData.notes || '',
         items: cart.map(item => ({
           product: item.product._id,
-          quantity: item.quantity
+          quantity: item.quantity,
+          selectedSize: item.selectedSize // إضافة المقاس المختار
         }))
       };
+
+      console.log('📦 Order data being sent:', orderData); // للتصحيح
 
       const response = await orderAPI.create(orderData);
       
@@ -182,7 +185,7 @@ const Checkout = () => {
               
               <div className="space-y-6 mb-8">
                 {cart.map(item => (
-                  <div key={item.product._id} className="flex items-center gap-6 p-6 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-2xl hover:shadow-lg transition-all duration-300">
+                  <div key={`${item.product._id}-${item.selectedSize}`} className="flex items-center gap-6 p-6 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-2xl hover:shadow-lg transition-all duration-300">
                     <div className="relative">
                       <img
                         src={item.product.image}
@@ -200,9 +203,14 @@ const Checkout = () => {
                       <h3 className="font-bold text-gray-800 text-xl leading-tight">
                         {item.product.name}
                       </h3>
-                      <p className="text-pink-600 font-bold text-lg">
-                        {item.product.price} ج.م
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <span className="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-semibold">
+                          المقاس: {item.selectedSize}
+                        </span>
+                        <p className="text-pink-600 font-bold text-lg">
+                          {item.product.price} ج.م
+                        </p>
+                      </div>
                       <div className="flex items-center gap-4">
                         <span className="text-gray-600 text-base">الكمية: {item.quantity}</span>
                       </div>
